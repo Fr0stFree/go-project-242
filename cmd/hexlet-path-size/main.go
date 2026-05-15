@@ -24,14 +24,14 @@ func main() {
 			&cli.BoolFlag{
 				Name:    "human",
 				Value:   false,
-				Aliases: []string{"h"},
-				Usage:   "print sizes in human-readable format",
+				Aliases: []string{"H"},
+				Usage:   "human-readable sizes (auto-select unit)",
 			},
 			&cli.BoolFlag{
 				Name:    "all",
 				Aliases: []string{"a"},
 				Value:   false,
-				Usage:   "show sizes for all files including hidden files",
+				Usage:   "include hidden files and directories",
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {

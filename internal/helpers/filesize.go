@@ -5,22 +5,34 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func GetPathSize(path string, recursive, human, all bool) (string, error) {
 	var totalSize int
 	onFile := func(info fs.FileInfo) {
-		totalSize += int(info.Size())
+		fmt.Println(info.Name())
+		if all || !strings.HasPrefix(info.Name(), ".") {
+			totalSize += int(info.Size())
+		}
+		
 	}
 
-	err := iterDir(path, onFile)
+	err := iterDirRec(path, onFile)
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%s\t%s", formatBytes(totalSize), path), nil
+
+	var bytes string
+	if human {
+		bytes = BytesToStringPretty(totalSize)
+	} else {
+		bytes = bytesToString(totalSize)
+	}
+	return fmt.Sprintf("%s\t%s", bytes, path), nil
 }
 
-func iterDir(path string, onFileCallback func(fs.FileInfo)) error {
+func iterDirRec(path string, onFileCallback func(fs.FileInfo)) error {
 	info, err := os.Lstat(path)
 	if err != nil {
 		return err
@@ -35,7 +47,7 @@ func iterDir(path string, onFileCallback func(fs.FileInfo)) error {
 	}
 	for _, entry := range entries {
 		if entry.IsDir() {
-			err = iterDir(filepath.Join(path, entry.Name()), onFileCallback)
+			err = iterDirRec(filepath.Join(path, entry.Name()), onFileCallback)
 			if err != nil {
 				return err
 			}
