@@ -9,24 +9,24 @@ import (
 
 func GetPathSize(path string, recursive, human, all bool) (string, error) {
 	var totalSize int
-	onFileCallback := func(info fs.FileInfo) {
+	onFile := func(info fs.FileInfo) {
 		totalSize += int(info.Size())
 	}
 
-	err := iterDir(path, onFileCallback)
+	err := iterDir(path, onFile)
 	if err != nil {
 		return "", err
 	}
 	return fmt.Sprintf("%s\t%s", formatBytes(totalSize), path), nil
 }
 
-func iterDir(path string, onFile func(fs.FileInfo)) error {
+func iterDir(path string, onFileCallback func(fs.FileInfo)) error {
 	info, err := os.Lstat(path)
 	if err != nil {
 		return err
 	}
 	if !info.IsDir() {
-		onFile(info)
+		onFileCallback(info)
 		return nil
 	}
 	entries, err := os.ReadDir(path)
@@ -35,7 +35,7 @@ func iterDir(path string, onFile func(fs.FileInfo)) error {
 	}
 	for _, entry := range entries {
 		if entry.IsDir() {
-			err = iterDir(filepath.Join(path, entry.Name()), onFile)
+			err = iterDir(filepath.Join(path, entry.Name()), onFileCallback)
 			if err != nil {
 				return err
 			}
@@ -44,7 +44,7 @@ func iterDir(path string, onFile func(fs.FileInfo)) error {
 		if err != nil {
 			return err
 		}
-		onFile(info)
+		onFileCallback(info)
 	}
 	return nil
 }
