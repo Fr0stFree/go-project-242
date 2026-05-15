@@ -18,8 +18,8 @@ func main() {
 			&cli.BoolFlag{
 				Name:    "recursive",
 				Aliases: []string{"r"},
-				Value:   true,
-				Usage:   "show total size of directory including all subdirectories",
+				Value:   false,
+				Usage:   "recursive size of directories",
 			},
 			&cli.BoolFlag{
 				Name:    "human",

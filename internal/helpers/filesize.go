@@ -10,29 +10,32 @@ import (
 
 func GetPathSize(path string, recursive, human, all bool) (string, error) {
 	var totalSize int
-	onFile := func(info fs.FileInfo) {
-		fmt.Println(info.Name())
+	var maxDepth = 1
+	if recursive {
+		maxDepth = -1
+	}
+	err := iterPathRec(path, 0, maxDepth, func(info fs.FileInfo) {
 		if all || !strings.HasPrefix(info.Name(), ".") {
 			totalSize += int(info.Size())
 		}
-		
-	}
-
-	err := iterDirRec(path, onFile)
+	})
 	if err != nil {
 		return "", err
 	}
-
-	var bytes string
-	if human {
-		bytes = BytesToStringPretty(totalSize)
-	} else {
-		bytes = bytesToString(totalSize)
-	}
-	return fmt.Sprintf("%s\t%s", bytes, path), nil
+	return formatResult(totalSize, path, human), nil
 }
 
-func iterDirRec(path string, onFileCallback func(fs.FileInfo)) error {
+func formatResult(size int, path string, isHumanReadable bool) string {
+	var bytes string
+	if isHumanReadable {
+		bytes = BytesToStringPretty(size)
+	} else {
+		bytes = bytesToString(size)
+	}
+	return fmt.Sprintf("%s\t%s", bytes, path)
+}
+
+func iterPathRec(path string, currDepth, maxDepth int, onFileCallback func(fs.FileInfo)) error {
 	info, err := os.Lstat(path)
 	if err != nil {
 		return err
@@ -41,13 +44,16 @@ func iterDirRec(path string, onFileCallback func(fs.FileInfo)) error {
 		onFileCallback(info)
 		return nil
 	}
+	if maxDepth >= 0 && currDepth >= maxDepth {
+		return nil
+	}
 	entries, err := os.ReadDir(path)
 	if err != nil {
 		return err
 	}
 	for _, entry := range entries {
 		if entry.IsDir() {
-			err = iterDirRec(filepath.Join(path, entry.Name()), onFileCallback)
+			err = iterPathRec(filepath.Join(path, entry.Name()), currDepth+1, maxDepth, onFileCallback)
 			if err != nil {
 				return err
 			}
