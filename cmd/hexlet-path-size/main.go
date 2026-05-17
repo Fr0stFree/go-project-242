@@ -1,7 +1,7 @@
 package main
 
 import (
-	"code/internal/helpers"
+	"code/internal/code"
 	"context"
 	"fmt"
 	"log"
@@ -40,7 +40,7 @@ func main() {
 			isHumanReadable := cmd.Bool("human")
 			shouldShowAll := cmd.Bool("all")
 
-			size, err := helpers.GetPathSize(path, isRecursive, isHumanReadable, shouldShowAll)
+			size, err := code.GetPathSize(path, isRecursive, isHumanReadable, shouldShowAll)
 			if err != nil {
 				return err
 			}
