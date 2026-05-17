@@ -15,7 +15,7 @@ func bytesToString(bytes int) string {
 	return fmt.Sprintf("%dB", bytes)
 }
 
-func BytesToStringPretty(bytes int) string {
+func bytesToStringPretty(bytes int) string {
 	switch {
 	case bytes < KB:
 		return fmt.Sprintf("%dB", bytes)

@@ -37,7 +37,7 @@ func newPathIterator(recursive bool) func(string) iter.Seq2[fs.FileInfo, error] 
 
 func newBytesFormatter(human bool) func(int) string {
 	if human {
-		return BytesToStringPretty
+		return bytesToStringPretty
 	}
 	return bytesToString
 }
