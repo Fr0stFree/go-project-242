@@ -23,10 +23,13 @@ func GetPathSize(path string, recursive, human, all bool) (string, error) {
 		}
 		totalSize += int(info.Size())
 	}
-	return fmt.Sprintf("%s\t%s", fmtBytes(totalSize), path), nil
+	return fmtBytes(totalSize), nil
 }
 
 func shouldSkip(all bool, info fs.FileInfo) bool {
+	if info.IsDir() {
+		return true
+	}
 	if all {
 		return false
 	}
